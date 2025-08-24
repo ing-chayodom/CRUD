@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -73,14 +74,16 @@ WSGI_APPLICATION = 'checker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'product_checker',
-        'USER': 'admin',
-        'PASSWORD': 'qwer1234',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv("DB_NAME", "product_checker"),
+        'USER': os.getenv("DB_USER", "admin"),
+        'PASSWORD': os.getenv("DB_PASSWORD", "qwer1234"),
+        'HOST': os.getenv("DB_HOST", "127.0.0.1"),
+        'PORT': os.getenv("DB_PORT", "5432"),
     }
 }
 
