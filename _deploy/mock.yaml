@@ -1,0 +1,155 @@
+---
+# Source: CRUD/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: CRUD-Secret
+  namespace: dev
+type: Opaque
+data:
+  DB_USER: "admin"
+  DB_PASSWORD: "qwer1234"
+  DB_PORT: "5432"
+---
+# Source: CRUD/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: CRUD-Config-Map
+  namespace: dev
+data:
+  DB_NAME: "product_checker"
+  DB_HOST: "postgres"
+---
+# Source: CRUD/templates/service.yaml
+### CRUD Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: release-name-CRUD
+  namespace: default
+  labels:
+    helm.sh/chart: CRUD-0.1.0
+    app.kubernetes.io/name: CRUD
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: CRUD
+    app.kubernetes.io/instance: release-name
+---
+# Source: CRUD/templates/service.yaml
+### Postgres Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: dev
+  labels:
+    app: postgres-svc
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 5432
+  selector:
+    app: postgres-svc
+---
+# Source: CRUD/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-CRUD
+  namespace: default
+  labels:
+    helm.sh/chart: CRUD-0.1.0
+    app.kubernetes.io/name: CRUD
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: CRUD
+      app.kubernetes.io/instance: release-name
+  template:
+    metadata:
+      labels:
+        helm.sh/chart: CRUD-0.1.0
+        app.kubernetes.io/name: CRUD
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/version: "1.16.0"
+        app.kubernetes.io/managed-by: Helm
+    spec:
+      containers:
+        - name: CRUD
+          image: "nginx:latest"
+          envFrom:
+            configMapRef:
+              - name: CRUD-Config-Map
+            secretRef:
+              - name: CRUD-Secret
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+---
+# Source: CRUD/templates/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: dev
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: postgres-svc
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16
+        envFrom:
+          configMapRef:
+            - name: CRUD-Config-Map
+          secretRef:
+            - name: CRUD-Secret
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: pgdata
+          mountPath: pgdata:/var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: pgdata
+    spec:
+      storageClassName: "Longhorn"
+      accessModes: [ "ReadWriteMany" ]
+      resources:
+        requests:
+          storage: 2Gi

@@ -1,0 +1,37 @@
+### CRUD Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "CRUD.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "CRUD.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.containerPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "CRUD.selectorLabels" . | nindent 4 }}
+
+---
+
+### Postgres Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+  namespace: dev
+  labels:
+    app: postgres-svc
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 5432
+  selector:
+    app: postgres-svc
