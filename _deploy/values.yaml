@@ -8,6 +8,8 @@ image:
 # imagePullSecrets:
 #   - name: secretname
 
+###
+
 nameOverride: ""
 fullnameOverride: ""
 
