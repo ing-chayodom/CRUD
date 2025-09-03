@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "CRUD.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  namespace: dev
   labels:
     {{- include "CRUD.labels" . | nindent 4 }}
 spec:

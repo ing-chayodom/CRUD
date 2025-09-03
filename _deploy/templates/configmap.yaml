@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: CRUD-Config-Map
-  namespace: dev
-data:
-  DB_NAME: "product_checker"
-  DB_HOST: "postgres"
