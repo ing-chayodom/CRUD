@@ -39,11 +39,11 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          envFrom:
-            configMapRef:
-              - name: CRUD-Config-Map
-            secretRef:
-              - name: CRUD-Secret
+          # envFrom:
+          #   configMapRef:
+          #     - name: CRUD-Config-Map
+          #   secretRef:
+          #     - name: CRUD-Secret
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
