@@ -12,7 +12,5 @@ spec:
   ports:
     - port: {{ .Values.service.port }}
       targetPort: {{ .Values.containerPort }}
-      protocol: TCP
-      name: http
   selector:
     {{- include "CRUD.selectorLabels" . | nindent 4 }}
