@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "CRUD.fullname" . }}
+  name: nginx
   namespace: dev
   labels:
     {{- include "CRUD.labels" . | nindent 4 }}
