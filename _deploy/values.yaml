@@ -10,8 +10,8 @@ image:
 
 ###
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: "nginx"
+fullnameOverride: "nginx"
 
 serviceAccount:
   create: false
